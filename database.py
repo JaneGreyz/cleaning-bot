@@ -1,9 +1,13 @@
+import os
 from sqlalchemy import create_engine, Column, Integer, Float, String, ForeignKey, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///cleaning_bot.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///cleaning_bot.db")
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -30,7 +34,7 @@ class Order(Base):
     service_id = Column(Integer, ForeignKey("services.id"))
     params = Column(JSON)
     total_price = Column(Float)
-    status = Column(String, default="pending")  # Статус заказа: pending, in_progress, completed
+    status = Column(String, default="pending")  # pending, in_progress, completed
     user = relationship("User", back_populates="orders")
     service = relationship("Service", back_populates="orders")
 
