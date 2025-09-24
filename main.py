@@ -1,10 +1,10 @@
-import asyncio
 import os
 from aiogram import Bot, Dispatcher
 from handlers import router
 from database import init_db
 from dotenv import load_dotenv
-from flask import Flask  # pyright: ignore[reportMissingImports]
+from flask import Flask
+import threading
 
 load_dotenv()
 bot_token = os.getenv("BOT_TOKEN")
@@ -27,7 +27,14 @@ async def start_bot():
     print("Бот начинает опрос...")
     await dp.start_polling(bot)
 
-if __name__ == "__main__":
+def run_flask():
     port = int(os.environ.get('PORT', 10000))
-    asyncio.run(start_bot())
     app.run(host='0.0.0.0', port=port)
+
+if __name__ == "__main__":
+    # Запускаем Flask в отдельном потоке
+    flask_thread = threading.Thread(target=run_flask, daemon=True)
+    flask_thread.start()
+    # Запускаем бота
+    import asyncio
+    asyncio.run(start_bot())
