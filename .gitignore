@@ -1,1 +1,5 @@
-BOT_TOKEN=8279916210:AAH7n3-HBhaUBRTiLlYXgdumhdpFnwOhATA
+.env
+*.db
+__pycache__
+.DS_Store
+nohup.out
